@@ -4,10 +4,13 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 
-import io.mobile.citylocationviewer.data.CitiesFileProvider;
+import io.mobile.citylocationviewer.data.CitiesFileStreamProvider;
 import io.mobile.citylocationviewer.data.CitiesRepository;
 import io.mobile.citylocationviewer.data.implementation.CitiesRepositoryImpl;
 import io.mobile.citylocationviewer.model.City;
@@ -15,11 +18,17 @@ import io.mobile.citylocationviewer.model.City;
 public class CitiesRepositoryTest {
 
 
-    private CitiesFileProvider fileProvider = new CitiesFileProvider() {
+    private CitiesFileStreamProvider fileProvider = new CitiesFileStreamProvider() {
+
         @Override
-        public File getFile() {
-            URL urlToFile = CitiesRepositoryTest.this.getClass().getClassLoader().getResource("cities.json");
-            return new File(urlToFile.getFile());
+        public InputStream getInputStream() {
+            try {
+                URL urlToFile = CitiesRepositoryTest.this.getClass().getClassLoader().getResource("cities.json");
+                return new FileInputStream(new File(urlToFile.getFile()));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                return null;
+            }
         }
     };
 

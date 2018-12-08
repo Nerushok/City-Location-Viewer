@@ -4,8 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,7 +11,7 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
-import io.mobile.citylocationviewer.data.CitiesFileProvider;
+import io.mobile.citylocationviewer.data.CitiesFileStreamProvider;
 import io.mobile.citylocationviewer.data.CitiesRepository;
 import io.mobile.citylocationviewer.model.City;
 
@@ -21,13 +19,13 @@ public class CitiesRepositoryImpl implements CitiesRepository {
 
 
     private final String TAG = this.getClass().getSimpleName();
-    private CitiesFileProvider fileProvider;
+    private CitiesFileStreamProvider fileStreamProvider;
 
     private final List<City> cities = new ArrayList<>(10000);
 
 
-    public CitiesRepositoryImpl(CitiesFileProvider fileProvider) {
-        this.fileProvider = fileProvider;
+    public CitiesRepositoryImpl(CitiesFileStreamProvider fileStreamProvider) {
+        this.fileStreamProvider = fileStreamProvider;
     }
 
 
@@ -36,8 +34,7 @@ public class CitiesRepositoryImpl implements CitiesRepository {
         if (isInitiated()) return;
 
         try {
-            InputStream fileInputStream = new FileInputStream(fileProvider.getFile());
-            InputStreamReader streamReader = new InputStreamReader(fileInputStream, "UTF-8");
+            InputStreamReader streamReader = new InputStreamReader(fileStreamProvider.getInputStream(), "UTF-8");
             JsonReader reader = new JsonReader(streamReader);
 
             try {
@@ -46,7 +43,6 @@ public class CitiesRepositoryImpl implements CitiesRepository {
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
-                fileInputStream.close();
                 streamReader.close();
                 reader.close();
             }
