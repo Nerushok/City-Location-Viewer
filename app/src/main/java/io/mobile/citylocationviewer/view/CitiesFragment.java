@@ -171,7 +171,16 @@ public class CitiesFragment extends Fragment {
     }
 
     private void setViewVisibility(View view, boolean visible) {
+        if (visible) {
+            if (view.getVisibility() == View.VISIBLE) return;
+        } else {
+            if (view.getVisibility() == View.GONE || view.getVisibility() == View.INVISIBLE) return;
+        }
         view.setVisibility(visible ? View.VISIBLE : View.GONE);
+        view.animate()
+                .alpha(visible ? 1f : 0)
+                .setDuration(150)
+                .start();
     }
 
     /*
