@@ -16,7 +16,7 @@ import io.mobile.citylocationviewer.model.City;
 public class CitiesAdapter extends RecyclerView.Adapter<CitiesAdapter.CityViewHolder> {
 
 
-    private List<City> cities = new ArrayList<>();
+    private final List<City> cities = new ArrayList<>();
     private OnCityClickListener onCityClickListener;
 
 

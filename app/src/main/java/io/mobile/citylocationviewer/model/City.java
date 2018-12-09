@@ -4,10 +4,10 @@ import com.google.gson.annotations.SerializedName;
 
 public class City {
 
-    @SerializedName("_id") private int id;
-    @SerializedName("name") private String name;
-    @SerializedName("country") private String country;
-    @SerializedName("coord") private Coordinate coordinate;
+    @SerializedName("_id") private final int id;
+    @SerializedName("name") private final String name;
+    @SerializedName("country") private final String country;
+    @SerializedName("coord") private final Coordinate coordinate;
 
     public City(int id, String name, String country, Coordinate coordinate) {
         this.id = id;

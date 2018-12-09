@@ -4,8 +4,8 @@ import com.google.gson.annotations.SerializedName;
 
 public class Coordinate {
 
-    @SerializedName("lon") private float longitude;
-    @SerializedName("lat") private float latitude;
+    @SerializedName("lon") private final float longitude;
+    @SerializedName("lat") private final float latitude;
 
     public Coordinate(float longitude, float latitude) {
         this.longitude = longitude;

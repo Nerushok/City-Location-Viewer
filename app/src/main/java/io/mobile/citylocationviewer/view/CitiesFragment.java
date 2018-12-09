@@ -1,6 +1,9 @@
 package io.mobile.citylocationviewer.view;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.pm.ResolveInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -16,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.List;
+import java.util.Locale;
 
 import io.mobile.citylocationviewer.R;
 import io.mobile.citylocationviewer.data.CitiesRepository;
@@ -40,6 +44,7 @@ public class CitiesFragment extends Fragment {
         @Override
         public void onClick(City city) {
             Log.d(TAG, "Click on item: " + city.getName());
+            openCityOnMap(city);
         }
     };
 
@@ -70,7 +75,6 @@ public class CitiesFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        findViews();
         initViews();
     }
 
@@ -87,20 +91,14 @@ public class CitiesFragment extends Fragment {
 
         loadingDialog = new ProgressDialog(getContext());
         loadingDialog.setCancelable(false);
-        loadingDialog.setMessage("Loading...");
+        loadingDialog.setMessage(getString(R.string.text_loading));
 
         citiesRepository = createCitiesRepository();
         initRepository();
     }
 
-    private void findViews() {
-        searchView = getView().findViewById(R.id.search_view);
-        citiesList = getView().findViewById(R.id.list_city);
-        emptyView = getView().findViewById(R.id.empty_view);
-        progressView = getView().findViewById(R.id.progress_view);
-    }
-
     private void initViews() {
+        findViews();
         citiesList.setLayoutManager(new LinearLayoutManager(getContext()));
         citiesList.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
         citiesList.setItemAnimator(null);
@@ -108,6 +106,7 @@ public class CitiesFragment extends Fragment {
         citiesList.setHasFixedSize(true);
         citiesList.setItemViewCacheSize(20);
 
+        searchView.setQueryHint(getString(R.string.hint_search_city));
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
@@ -122,12 +121,18 @@ public class CitiesFragment extends Fragment {
         });
     }
 
+    private void findViews() {
+        searchView = getView().findViewById(R.id.search_view);
+        citiesList = getView().findViewById(R.id.list_city);
+        emptyView = getView().findViewById(R.id.empty_view);
+        progressView = getView().findViewById(R.id.progress_view);
+    }
+
     private CitiesRepository createCitiesRepository() {
         return new CitiesRepositoryImpl(new CitiesFileStreamProviderImpl(getContext()));
     }
 
     private void initRepository() {
-        Log.d(TAG, "initRepository: ");
         new InitRepositoryTask().execute();
     }
 
@@ -169,12 +174,39 @@ public class CitiesFragment extends Fragment {
         view.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
+    /*
+    Mobile assignment RnD has one requirement:
+    Selecting a city will show a map centered on the coordinates associated with the city.
+
+    As I see assignment document was created in 2017.
+    But in 2018 Google changed terms of use Google Maps API:
+    "As of June 11, 2018, you must enable billing with a credit card and have a valid API key
+    for all of your projects. This will give you the ability to scale easily with less downtime and fewer performance issues."
+    More information: https://cloud.google.com/maps-platform/user-guide/?__utma=102347093.1688426863.1544265501.1544382380.1544382380.1&__utmb=102347093.0.10.1544382380&__utmc=102347093&__utmx=-&__utmz=102347093.1544382380.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none)&__utmv=-&__utmk=186722728&_ga=2.181375591.1912917427.1544380109-1688426863.1544265501
+
+    It mean, that now I should setup Billing for Google Maps API.
+
+    So I just send Intent for exist Map apps.
+     */
+    private void openCityOnMap(City city) {
+        float latitude = city.getCoordinate().getLatitude();
+        float longitude = city.getCoordinate().getLongitude();
+        String uri = String.format(Locale.ENGLISH, "geo:%f,%f", latitude, longitude);
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+
+        List<ResolveInfo> activities = getActivity()
+                .getPackageManager()
+                .queryIntentActivities(intent, 0);
+        boolean isIntentSafe = activities.size() > 0;
+
+        if (isIntentSafe) startActivity(intent);
+    }
+
 
     public class InitRepositoryTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            Log.d(TAG, "init repo");
             loadingDialog.show();
         }
 
@@ -194,7 +226,8 @@ public class CitiesFragment extends Fragment {
 
     public class SearchCitiesTask extends AsyncTask<Void, Void, List<City>> {
 
-        @Nullable private final String query;
+        @Nullable
+        private final String query;
 
         SearchCitiesTask(String query) {
             this.query = query;

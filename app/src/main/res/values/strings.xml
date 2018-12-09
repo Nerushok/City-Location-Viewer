@@ -3,5 +3,6 @@
     <string name="app_name">CityLocationViewer</string>
     <string name="hint_search_city">City</string>
     <string name="text_empty_view">No result</string>
+    <string name="text_loading">Loading…</string>
 
 </resources>
