@@ -111,9 +111,9 @@ public class CitiesRepositoryTest {
 
     private boolean allCitiesStartedWithPrefix(String prefix) {
         List<City> cities = searchByPrefix(prefix);
+        String searchPrefix = prefix.toLowerCase();
         for (City city : cities) {
             String cityName = city.getName().toLowerCase();
-            String searchPrefix = prefix.toLowerCase();
             if (!cityName.startsWith(searchPrefix)) return false;
         }
         return true;
