@@ -21,7 +21,7 @@ public class CitiesRepositoryImpl implements CitiesRepository {
     private final String TAG = this.getClass().getSimpleName();
     private CitiesFileStreamProvider fileStreamProvider;
 
-    private final List<City> cities = new ArrayList<>(10000);
+    private final List<City> cities = new ArrayList<>(200000);
 
 
     public CitiesRepositoryImpl(CitiesFileStreamProvider fileStreamProvider) {
@@ -58,14 +58,9 @@ public class CitiesRepositoryImpl implements CitiesRepository {
 
         if (prefix == null || prefix.trim().isEmpty()) return cities;
 
-        List<City> filteredList = new LinkedList<>();
-        for (City city : cities) {
-            String cityName = city.getName().toLowerCase();
-            String searchPrefix = prefix.toLowerCase();
-            if (cityName.startsWith(searchPrefix)) filteredList.add(city);
-        }
+        String searchPrefix = prefix.toLowerCase();
 
-        return filteredList;
+        return searchByPrefixInternal(searchPrefix);
     }
 
     private boolean isInitiated() {
@@ -90,5 +85,15 @@ public class CitiesRepositoryImpl implements CitiesRepository {
                 return (result != 0) ? result : o1.getName().compareTo(o2.getName());
             }
         });
+    }
+
+    private List<City> searchByPrefixInternal(String prefix) {
+        List<City> filteredList = new LinkedList<>();
+        for (City city : cities) {
+            String cityName = city.getName().toLowerCase();
+            if (cityName.startsWith(prefix)) filteredList.add(city);
+        }
+
+        return filteredList;
     }
 }

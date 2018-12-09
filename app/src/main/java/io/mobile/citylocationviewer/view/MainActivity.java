@@ -16,9 +16,6 @@ public class MainActivity extends AppCompatActivity {
 
     private final String TAG_CITIES_FRAGMENT = "TAG_CITIES_FRAGMENT";
 
-    {
-        System.out.println("create class");
-    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -38,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
         View root = new FrameLayout(this);
         root.setId(R.id.idRoot);
         root.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-
         return root;
     }
 }
