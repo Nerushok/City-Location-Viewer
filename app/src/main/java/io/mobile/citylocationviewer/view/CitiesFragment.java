@@ -50,6 +50,7 @@ public class CitiesFragment extends Fragment {
 
     private CitiesRepository citiesRepository;
 
+    private InitRepositoryTask initRepositoryTask;
     private SearchCitiesTask loadCitiesByQueryTask;
 
     private String lastQuery;
@@ -80,8 +81,20 @@ public class CitiesFragment extends Fragment {
 
     @Override
     public void onStop() {
-        super.onStop();
         if (loadCitiesByQueryTask != null) loadCitiesByQueryTask.cancel(true);
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroyView() {
+        if (loadingDialog != null && loadingDialog.isShowing()) loadingDialog.dismiss();
+        super.onDestroyView();
+    }
+
+    @Override
+    public void onDestroy() {
+        if (initRepositoryTask != null) initRepositoryTask.cancel(true);
+        super.onDestroy();
     }
 
     private void initRetainedData() {
@@ -133,7 +146,8 @@ public class CitiesFragment extends Fragment {
     }
 
     private void initRepository() {
-        new InitRepositoryTask().execute();
+        initRepositoryTask = new InitRepositoryTask();
+        initRepositoryTask.execute();
     }
 
     private void searchCities(@Nullable String query) {
@@ -216,7 +230,7 @@ public class CitiesFragment extends Fragment {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            loadingDialog.show();
+            if (!loadingDialog.isShowing()) loadingDialog.show();
         }
 
         @Override
