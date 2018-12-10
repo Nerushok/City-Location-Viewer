@@ -18,20 +18,31 @@ import io.mobile.citylocationviewer.model.City;
 public class CitiesRepositoryImpl implements CitiesRepository {
 
 
+    private static CitiesRepositoryImpl INSTANCE;
+
     private final String TAG = this.getClass().getSimpleName();
     private CitiesFileStreamProvider fileStreamProvider;
 
+    private volatile boolean isInitiated = false;
     private final List<City> cities = new ArrayList<>(200000);
 
 
-    public CitiesRepositoryImpl(CitiesFileStreamProvider fileStreamProvider) {
+    private CitiesRepositoryImpl(CitiesFileStreamProvider fileStreamProvider) {
         this.fileStreamProvider = fileStreamProvider;
     }
 
+    public static synchronized CitiesRepository getInstance(CitiesFileStreamProvider fileStreamProvider) {
+        if (INSTANCE == null) {
+            INSTANCE = new CitiesRepositoryImpl(fileStreamProvider);
+        }
+        return INSTANCE;
+    }
 
     @Override
     public void init() {
         if (isInitiated()) return;
+
+        isInitiated = true;
 
         try {
             InputStreamReader streamReader = new InputStreamReader(fileStreamProvider.getInputStream(), "UTF-8");
@@ -64,7 +75,7 @@ public class CitiesRepositoryImpl implements CitiesRepository {
     }
 
     private boolean isInitiated() {
-        return !cities.isEmpty();
+        return isInitiated;
     }
 
     private void fillCitiesList(JsonReader reader) throws Exception {

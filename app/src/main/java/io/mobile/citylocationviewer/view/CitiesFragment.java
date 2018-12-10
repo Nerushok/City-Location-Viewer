@@ -129,7 +129,7 @@ public class CitiesFragment extends Fragment {
     }
 
     private CitiesRepository createCitiesRepository() {
-        return new CitiesRepositoryImpl(new CitiesFileStreamProviderImpl(getContext()));
+        return CitiesRepositoryImpl.getInstance(new CitiesFileStreamProviderImpl(getContext()));
     }
 
     private void initRepository() {

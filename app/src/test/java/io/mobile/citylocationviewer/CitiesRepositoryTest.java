@@ -100,7 +100,7 @@ public class CitiesRepositoryTest {
     }
 
     private CitiesRepository getInitiatedRepository() {
-        CitiesRepository repository = new CitiesRepositoryImpl(fileProvider);
+        CitiesRepository repository = CitiesRepositoryImpl.getInstance(fileProvider);
         repository.init();
         return repository;
     }
